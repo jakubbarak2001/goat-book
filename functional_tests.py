@@ -23,7 +23,7 @@ class NewVisitorTest(unittest.TestCase):
         #There is still a text box inviting him to write a new item
         #He creates new item "Visit parents."
 
-        #The age updates again, now showing both of the items in the to-do list
+        #The page updates again, now showing both of the items in the to-do list
         #Satisfied, he goes to sleep
 
 if __name__ == '__main__':
