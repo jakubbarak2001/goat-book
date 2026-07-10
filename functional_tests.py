@@ -31,20 +31,31 @@ class NewVisitorTest(unittest.TestCase):
         #When he hits enter, the page updates, and now the page lists
         # "1: study python" as an item in a to-do list table
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
+        time.sleep(10)
 
         table = self.browser.find_element(By.ID, "id_list_table")
         rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertTrue(
-         any(row.text == "1: study python" for row in rows),
-          "New to-do item did not appear in table",
-          )
+        self.assertIn("1: study python", [row.text for row in rows])
 
         #There is still a text box inviting him to write a new item
         #He creates new item "Visit parents."
-        self.fail("Finish the test")
+        inputbox = self.browser.find_element(By.ID, "id_new_item")
+        inputbox.send_keys("Visit parents")
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         #The page updates again, now showing both of the items in the to-do list
+        table = self.browser.find_element(By.ID, "id_list_table")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        self.assertIn(
+            "2: Visit parents",
+            [row.text for row in rows],
+        )
+        self.assertIn(
+            "1: Study Python",
+            [row.text for row in rows],
+        )
+
         #Satisfied, he goes to sleep
 
 if __name__ == '__main__':
