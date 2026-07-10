@@ -11,6 +11,11 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
 
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element(By.ID, "id_list_table")
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        self.assertIn(row_text, [row.text for row in rows])
+
     def test_can_start_a_todo_list(self):
         # Jacob has heard of a new cool on-line to do app.
         # He opens his browser to check the app's homepage
@@ -32,6 +37,7 @@ class NewVisitorTest(unittest.TestCase):
         # "1: study python" as an item in a to-do list table
         inputbox.send_keys(Keys.ENTER)
         time.sleep(10)
+        self.check_for_row_in_list_table("1: study python")
 
         table = self.browser.find_element(By.ID, "id_list_table")
         rows = table.find_elements(By.TAG_NAME, "tr")
@@ -45,16 +51,8 @@ class NewVisitorTest(unittest.TestCase):
         time.sleep(1)
 
         #The page updates again, now showing both of the items in the to-do list
-        table = self.browser.find_element(By.ID, "id_list_table")
-        rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(
-            "2: Visit parents",
-            [row.text for row in rows],
-        )
-        self.assertIn(
-            "1: Study Python",
-            [row.text for row in rows],
-        )
+        self.check_for_row_in_list_table("2: Visit parents")
+        self.check_for_row_in_list_table("1: study python")
 
         #Satisfied, he goes to sleep
 
