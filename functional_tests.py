@@ -36,7 +36,7 @@ class NewVisitorTest(unittest.TestCase):
         #When he hits enter, the page updates, and now the page lists
         # "1: study python" as an item in a to-do list table
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(10)
+        time.sleep(2)
         self.check_for_row_in_list_table("1: study python")
 
         table = self.browser.find_element(By.ID, "id_list_table")
