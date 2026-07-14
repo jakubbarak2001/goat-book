@@ -1,10 +1,13 @@
 from selenium import webdriver
+from selenium.common import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from pathlib import Path
 import time
 from django.test import LiveServerTestCase
+
+MAX_WAIT = 5
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -18,10 +21,19 @@ class NewVisitorTest(LiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element(By.ID, "id_list_table")
-        rows = table.find_elements(By.TAG_NAME, "tr")
-        self.assertIn(row_text, [row.text for row in rows])
+    def wait_for_row_in_list_table(self, row_text):
+        start_time = time.time()
+        while True:
+            try:
+                table = self.browser.find_element(By.ID, "id_list_table")
+                rows = table.find_elements(By.TAG_NAME, "tr")
+                self.assertIn(row_text, [row.text for row in rows])
+                return
+            except (AssertionError, WebDriverException):
+                if time.time() - start_time > MAX_WAIT:
+                    raise
+                time.sleep(0.5)
+
 
     def test_can_start_a_todo_list(self):
         # Jacob has heard of a new cool on-line to do app.
@@ -43,8 +55,7 @@ class NewVisitorTest(LiveServerTestCase):
         #When he hits enter, the page updates, and now the page lists
         # "1: study python" as an item in a to-do list table
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(2)
-        self.check_for_row_in_list_table("1: study python")
+        self.wait_for_row_in_list_table("1: study python")
 
         table = self.browser.find_element(By.ID, "id_list_table")
         rows = table.find_elements(By.TAG_NAME, "tr")
@@ -55,10 +66,9 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox = self.browser.find_element(By.ID, "id_new_item")
         inputbox.send_keys("Visit parents")
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         #The page updates again, now showing both of the items in the to-do list
-        self.check_for_row_in_list_table("2: Visit parents")
-        self.check_for_row_in_list_table("1: study python")
+        self.wait_for_row_in_list_table("2: Visit parents")
+        self.wait_for_row_in_list_table("1: study python")
 
         #Satisfied, he goes to sleep
