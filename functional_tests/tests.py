@@ -1,12 +1,19 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
+from pathlib import Path
 import time
-import unittest
+from django.test import LiveServerTestCase
 
-class NewVisitorTest(unittest.TestCase):
+
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        options = Options()
+        snap_firefox = Path("/snap/firefox/current/usr/lib/firefox/firefox")
+        if snap_firefox.exists():
+            options.binary_location = str(snap_firefox)
+        self.browser = webdriver.Firefox(options=options)
 
     def tearDown(self):
         self.browser.quit()
@@ -19,7 +26,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_todo_list(self):
         # Jacob has heard of a new cool on-line to do app.
         # He opens his browser to check the app's homepage
-        self.browser.get("http://localhost:8000")
+        self.browser.get(self.live_server_url)
 
         #He notices that the site shows 'To-Do' in its title
         self.assertIn("To-Do", self.browser.title)
@@ -55,6 +62,3 @@ class NewVisitorTest(unittest.TestCase):
         self.check_for_row_in_list_table("1: study python")
 
         #Satisfied, he goes to sleep
-
-if __name__ == '__main__':
-    unittest.main()
